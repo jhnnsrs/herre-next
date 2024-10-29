@@ -6,7 +6,7 @@ from herre_next.grants.oauth2.base import BaseOauth2Grant
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
 from fakts_next import Fakts
 from herre_next.models import Token, TokenRequest
-
+import logging
 
 class HerreFakt(BaseModel):
     """A fakt for the herre_next grant"""
@@ -112,6 +112,10 @@ class FaktsGrant(BaseOauth2Grant):
             return await self._activegrant.afetch_token(request)
         except InvalidClientError as e:
             if self.allow_reconfiguration_on_invalid_client:
+                logging.warning(
+                    "Invalid client error, trying to reconfigure the grant", exc_info=True
+                )
+                await self.fakts.arefresh()
                 self._old_fakt = await self.fakts.aget(
                     self.fakts_group, force_refresh=True
                 )
