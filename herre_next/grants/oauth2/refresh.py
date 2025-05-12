@@ -1,3 +1,4 @@
+from operator import is_
 import aiohttp
 import ssl
 from typing import Optional
@@ -88,15 +89,15 @@ class RefreshGrant(BaseGrant):
         Token
             The token
         """
-        if request.context.get("allow_refresh", True):
+        if request.allow_refresh:
             if self._token and not self._token.is_expired():
                 return self._token
 
             if self._token and self._token.refresh_token:
                 try:
-                    assert (
-                        self._token.refresh_token
-                    ), "Token had not refresh-token attached"
+                    assert self._token.refresh_token, (
+                        "Token had not refresh-token attached"
+                    )
                     self._token = await arefresh(
                         resfresh_url=build_refresh_url(self.grant),
                         client_id=self.grant.client_id.get_secret_value(),

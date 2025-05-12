@@ -1,10 +1,10 @@
-""" Basic types for the herre_next library
+"""Basic types for the herre_next library
 
 This module contains the basic types for the herre_next library.
 
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from pydantic import BaseModel, Field
 import time
 
@@ -20,10 +20,9 @@ class TokenRequest(BaseModel):
 
     """
 
+    allow_refresh: bool = True
     is_refresh: bool = False
     """Whether this is a refresh request"""
-    context: Dict[str, Any]
-    """The context of the request"""
 
 
 class Token(BaseModel):

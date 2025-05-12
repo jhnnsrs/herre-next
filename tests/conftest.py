@@ -3,7 +3,6 @@ import pytest
 from herre_next import Herre
 from herre_next.grants.oauth2.client_credentials import ClientCredentialsGrant
 from .utils import build_relative
-from testcontainers.compose import DockerCompose
 import subprocess
 from functools import cached_property
 import pytest

@@ -1,30 +1,54 @@
-[tool.poetry]
+[project]
 name = "herre-next"
-version = "1.0.2"
+version = "1.1.0"
+description = "asynchronous configuration provider ( tailored to support dynamic client-server relations)"
+authors = [{ name = "jhnnsrs", email = "jhnnsrs@gmail.com" }]
+requires-python = ">=3.11"
 readme = "README.md"
-description = "oauth2/openid client tailored to pyqt and async environments"
-authors = ["jhnnsrs <jhnnsrs@gmail.com>"]
-license = "CC BY-NC 3.0"
-packages = [{ include = "herre_next" }]
+license = "MIT"
+dependencies = [
+    "pydantic>2",
+    "koil>=1.0.3",
+    "certifi>=2025.4.26",
+    "aiohttp>=3.11.18",
+    "pyyaml>=6.0.2",
+    "oauthlib>=3.2.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-aiohttp = ">3.7.4"
-certifi = ">2021"
-oauthlib = "^3.1.1"
-pydantic = ">2"
-koil = ">=1.0.0"
-QtPy = { version = "^2.0.1", optional = true }
 
-[tool.poetry.extras]
-qt = ["QtPy"]
-windowed = ["PyQtWebEngine"]
+[tool.uv]
+dev-dependencies = [
+    "aioresponses>=0.7.8",
+    "pyqt5>=5.15.11",
+    "pyqtwebengine>=5.15.7",
+    "pytest-asyncio>=0.26.0",
+    "pytest-cov>=6.1.1",
+    "pytest-qt>=4.4.0",
+    "pytest>=8.3.5",
+    "python-semantic-release>=9.21.1",
+]
 
+[tool.hatch.build.targets.sdist]
+include = ["herre_next"]
+
+[tool.hatch.build.targets.wheel]
+include = ["herre_next"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+qt_api = "pyqt5"
+markers = [
+    "integration: marks tests that require a running server",
+    "qt: marks tests that require a running qt application",
+    "network: marks tests that require a network connection",
+]
 
 [tool.mypy]
 exclude = ["venv/", "tests/", "examples/"]
 ignore_missing_imports = true
-
 
 [tool.ruff]
 extend-select = ["ANN", "D1"]
@@ -59,43 +83,16 @@ exclude = [
 # Same as Black.
 line-length = 300
 
-[tool.poetry.group.dev.dependencies]
-autoflake = "^1.7.7"
-pytest = "^7.2.0"
-testcontainers = "^3.7.0"
-pytest-qt = "^4.2.0"
-pytest-asyncio = "^0.20.2"
-aiohttp = "^3.8.3"
-black = ">=22"
-pytest-cov = "^4.0.0"
-ruff = "^0.0.282"
-mypy = "^1.7.1"
-pydoc-markdown = "^4.8.2"
-aioresponses = "^0.7.6"
-pyqt5-stubs = "^5.15.6.0"
-
-
-[tool.pytest.ini_options]
-qt_api = "pyqt5"
-markers = [
-    "integration: marks tests that require a running server",
-    "qt: marks tests that require a running qt application",
-]
-
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
 [[tool.pydoc-markdown.loaders]]
 type = "python"
-search_path = ["herre"]
+search_path = ["fakts"]
 
 [tool.pydoc-markdown.renderer]
 type = "docusaurus"
 docs_base_path = "website/docs"
 
-
-[[tool.mypy.overrides]]
-module = ["oauthlib.*", "koil.*", "fakts.*"]
-ignore_missing_imports = true
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+upload_to_pypi = true
+branch = "main"
+build_command = "uv build"

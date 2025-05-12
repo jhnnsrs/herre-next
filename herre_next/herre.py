@@ -1,5 +1,5 @@
 import asyncio
-from typing import Optional, TypeVar
+from typing import Any, Optional, Type, TypeVar
 from herre_next.errors import HerreError, NoHerreFound
 from herre_next.grants.base import BaseGrant
 import os
@@ -88,13 +88,13 @@ class Herre(KoiledModel):
     @property
     def token(self) -> Token:
         "The current token"
-        assert (
-            self._lock is not None
-        ), "Please enter the context first to access this variable"
+        assert self._lock is not None, (
+            "Please enter the context first to access this variable"
+        )
         assert self._token is not None, "No token fetched"
         return self._token
 
-    async def aget_token(self, **kwargs) -> str:
+    async def aget_token(self) -> str:
         """Get an access token
 
         Will return an access token if it is already available or
@@ -107,32 +107,30 @@ class Herre(KoiledModel):
         Returns:
             str:  The access token
         """
-        assert (
-            self._lock is not None
-        ), "We were not initialized. Please enter the context first"
+        assert self._lock is not None, (
+            "We were not initialized. Please enter the context first"
+        )
 
         async with self._lock:
             if not self._token or not self._token.access_token:
-                await self.arequest_from_grant(TokenRequest(context=kwargs))
+                await self.arequest_from_grant(TokenRequest())
 
         assert self._token is not None, "We should have a token by now"
         return self._token.access_token
 
-    async def arefresh_token(self, **kwargs) -> str:
+    async def arefresh_token(self) -> str:
         """Refresh the token
 
         Will cause the linked grant to refresh the token. Depending
         on the link logic, this might cause another login.
 
         """
-        assert (
-            self._lock is not None
-        ), "We were not initialized. Please enter the context first"
+        assert self._lock is not None, (
+            "We were not initialized. Please enter the context first"
+        )
 
         async with self._lock:
-            await self.arequest_from_grant(
-                TokenRequest(is_refresh=True, context=kwargs)
-            )
+            await self.arequest_from_grant(TokenRequest(is_refresh=True))
             assert self._token is not None, "We should have a token by now"
             return self._token.access_token
 
@@ -158,48 +156,51 @@ class Herre(KoiledModel):
         self._token = potential_token
         return self._token
 
-    def get_token(self, **kwargs) -> str:
+    def get_token(self) -> str:
         """Get an access token
 
         Will return an access token if it is already available or
         try to login depending on auto_login. The checking and potential retrieving will happen
         in a lock ensuring that not multiple requests are happening at the same time.
         """
-        return unkoil(self.aget_token, **kwargs)
+        return unkoil(self.aget_token)
 
-    async def aget_user(self, **kwargs) -> BaseModel:  # TODO: Should be generic
+    async def aget_user(self) -> BaseModel:  # TODO: Should be generic
         """Get the current user
 
         Will return the current user if a fetcher is available
         """
-        assert (
-            self._lock is not None
-        ), "We were not initialized. Please enter the context first"
+        assert self._lock is not None, (
+            "We were not initialized. Please enter the context first"
+        )
         assert self.fetcher is not None, "We have no fetcher available"
         if not self._token:
             raise HerreError("No token available")
         async with self._lock:
             if not self._token or not self._token.access_token:
-                await self.arequest_from_grant(TokenRequest(context=kwargs))
+                await self.arequest_from_grant(TokenRequest())
 
         assert self._token is not None, "We should have a token by now"
         return await self.fetcher.afetch_user(self._token)
 
     async def __aenter__(self) -> "Herre":
         """Enters the context and logs in if needed"""
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "0" if self.allow_insecure else "1"
-        self._lock = asyncio.Lock()
+        if self.allow_insecure:
+            os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         current_herre_next.set(self)
-        if self.login_on_enter:
-            await self.alogin()
         self.entered = True
+        self._lock = asyncio.Lock()
         return self
 
-    async def __aexit__(self, *args, **kwargs) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        traceback: Optional[Any],
+    ) -> None:
         """Exits the context and logs out if needed"""
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "0"
-        if self.logout_on_exit:
-            await self.alogout()
+        if self.allow_insecure:
+            os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "0"
         current_herre_next.set(None)
 
     def _repr_html_inline_(self) -> str:

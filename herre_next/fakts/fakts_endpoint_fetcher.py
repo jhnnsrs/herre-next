@@ -45,12 +45,19 @@ class FaktsUserFetcher(BaseModel):
             headers={"Authorization": f"Bearer {token.access_token}"},
         ) as session:
             user_info_url = await self.fakts.aget(self.fakts_key)
+            assert isinstance(user_info_url, str), "User info url is not a string"
             async with session.get(
                 user_info_url + "/",
             ) as resp:
                 if resp.status == 200:
                     try:
                         data = await resp.json()
+                    except aiohttp.ContentTypeError as e:
+                        raise UserFetchingError(
+                            "Malformed answer, expected json"
+                        ) from e
+
+                    try:
                         return self.userModel(**data)
                     except Exception as e:
                         logger.error(f"Malformed answer: {data}", exc_info=True)

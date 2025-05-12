@@ -9,7 +9,7 @@ from .base import BaseOauth2Grant
 from typing import Awaitable
 from herre_next.models import Token, TokenRequest
 from typing import Protocol, runtime_checkable
-from oauthlib.common import generate_token, urldecode
+from oauthlib.common import generate_token, urldecode  # type: ignore
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ class Redirecter(Protocol):
         This function has to be implemented by the user.
 
         """
+        ...
 
     def astart(
         self,
@@ -83,7 +84,7 @@ class AuthorizationCodeGrant(BaseOauth2Grant):
             The token
         """
 
-        state = generate_token()
+        state: str = generate_token()
         scope = self.scope_delimiter.join(self.scopes)
         redirect_uri = await self.redirecter.aget_redirect_uri(request)
 

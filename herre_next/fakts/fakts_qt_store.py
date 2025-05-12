@@ -27,7 +27,7 @@ class FaktsQtStore(BaseModel):
     """Retrieves and stores users matching the currently
     active fakts grant"""
 
-    settings: QtCore.QSettings
+    settings: QtCore.QSettings  # type: ignore
     default_user_key: str = "default_user_fakts"
     fakts: Fakts
     fakts_key: str
@@ -49,12 +49,12 @@ class FaktsQtStore(BaseModel):
 
         """
         key = await self.fakts.aget(self.fakts_key)
-        un_storage = self.settings.value(self.default_user_key, None)
+        un_storage = self.settings.value(self.default_user_key, None)  # type: ignore
         if not un_storage:
             storage = OrderDefaults()
         else:
             try:
-                storage = OrderDefaults(**json.loads(un_storage))
+                storage = OrderDefaults(**json.loads(un_storage))  # type: ignore
             except Exception as e:
                 logger.debug(e, exc_info=True)
                 storage = OrderDefaults()
@@ -63,9 +63,9 @@ class FaktsQtStore(BaseModel):
             if key in storage.default_user:
                 del storage.default_user[key]
         else:
-            storage.default_user[key] = user
+            storage.default_user[key] = user  # type: ignore
 
-        self.settings.setValue(self.default_user_key, storage.json())
+        self.settings.setValue(self.default_user_key, storage.model_dump_json())  # type: ignore
 
     async def aget_default_user(self) -> Optional[StoredUser]:
         """Gets the default user
@@ -79,11 +79,11 @@ class FaktsQtStore(BaseModel):
             A stored user, with the token and the user
         """
         key = await self.fakts.aget(self.fakts_key)
-        un_storage = self.settings.value(self.default_user_key, None)
+        un_storage = self.settings.value(self.default_user_key, None)  # type: ignore
         if not un_storage:
             return None
         try:
-            storage = OrderDefaults(**json.loads(un_storage))
+            storage = OrderDefaults(**json.loads(un_storage))  # type: ignore
             if key in storage.default_user:
                 return storage.default_user[key]
         except Exception as e:

@@ -61,6 +61,10 @@ class UserinfoUserFetcher(BaseModel):
                 if resp.status == 200:
                     try:
                         data = await resp.json()
+                    except Exception as e:
+                        logger.error(f"Malformed answer: {await resp.text()}")
+                        raise UserFetchingError("Malformed Answer") from e
+                    try:
                         return self.userModel(**data)
                     except Exception as e:
                         logger.error(f"Malformed answer: {data}")

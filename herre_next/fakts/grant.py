@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, SecretStr
-from herre_next.grants.base import BaseGrant
 from herre_next.fakts.registry import GrantType, GrantRegistry
 from herre_next.grants.oauth2.base import BaseOauth2Grant
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
@@ -56,7 +55,7 @@ class FaktsGrant(BaseOauth2Grant):
     """Whether to allow reconfiguration on invalid client errors"""
 
     _configured = False
-    _activegrant: Optional[BaseGrant] = None
+    _activegrant: Optional["FaktsGrant"] = None
     _old_fakt: Dict[str, Any] = {}
 
     def configure(self, fakt: HerreFakt) -> None:
@@ -78,7 +77,7 @@ class FaktsGrant(BaseOauth2Grant):
         """
         grant_class = self.grant_registry.get_grant_for_type(fakt.grant_type)
 
-        self._activegrant = grant_class(**fakt.dict())
+        self._activegrant = grant_class(**fakt.model_dump())  # type: ignore
 
     async def afetch_token(self, request: TokenRequest) -> Token:
         """Fetches the token
@@ -104,7 +103,7 @@ class FaktsGrant(BaseOauth2Grant):
         """
 
         if self.fakts.has_changed(self._old_fakt, self.fakts_group):
-            self._old_fakt = await self.fakts.aget(self.fakts_group)
+            self._old_fakt = await self.fakts.aget(self.fakts_group)  # type: ignore
             self.configure(HerreFakt(**self._old_fakt))
 
         assert self._activegrant is not None, "Grant not configured"
@@ -118,10 +117,7 @@ class FaktsGrant(BaseOauth2Grant):
                     exc_info=True,
                 )
                 await self.fakts.arefresh()
-                self._old_fakt = await self.fakts.aget(
-                    self.fakts_group, force_refresh=True
-                )
-                self.configure(HerreFakt(**self._old_fakt))
+                self._old_fakt = await self.fakts.aget(self.fakts_group)  # type: ignore
                 return await self._activegrant.afetch_token(request)
             else:
                 raise e
