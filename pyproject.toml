@@ -1,7 +1,7 @@
 [project]
 name = "herre-next"
 version = "1.1.0"
-description = "asynchronous configuration provider ( tailored to support dynamic client-server relations)"
+description = "asynchronous ouath2 client"
 authors = [{ name = "jhnnsrs", email = "jhnnsrs@gmail.com" }]
 requires-python = ">=3.11"
 readme = "README.md"
