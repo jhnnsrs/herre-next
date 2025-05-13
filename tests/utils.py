@@ -2,7 +2,7 @@ import os
 import urllib
 import contextlib
 from typing import Callable
-from koil.qt import QtRunner
+from koil.qt import async_to_qt
 from pytestqt.qtbot import QtBot
 
 DIR_NAME = os.path.dirname(os.path.realpath(__file__))
@@ -52,34 +52,6 @@ def construct_final_redirect_uri(auth_url, code):
         redirect_query_params
     )  # Set the query component
     return urllib.parse.urlunparse(redirect_uri_components)
-
-
-def wait_for_qttask(qtbot: QtBot, task: QtRunner, cause: Callable[[QtBot], None]):
-    """Awaits a task and returns the result."""
-    out = ("MAGIC_NOTHINGNESS_WORD",)
-
-    def callback(*value):
-        nonlocal out
-        out = value
-
-    task.returned.connect(callback)
-    task.errored.connect(callback)
-
-    with qtbot.waitSignal(task.returned) as blocker:
-        blocker.connect(task.errored)
-        cause(qtbot)
-
-    if len(out) == 0:
-        raise RuntimeError("Task did not return a value.")
-
-    if isinstance(out[0], Exception):
-        raise out[0]
-    elif out[0] == "MAGIC_NOTHINGNESS_WORD":
-        raise RuntimeError("Task did not return a value.")
-    else:
-        if len(out) == 1:
-            return out[0]
-        return out
 
 
 async def redirect_result(starturl, *args, **kwargs):

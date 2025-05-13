@@ -1,16 +1,16 @@
 import pytest
 from herre_next import Herre
-from koil.qt import async_to_qt, QtRunner
-from koil.composition.qt import QtPedanticKoil
+from koil.qt import async_to_qt, create_qt_koil
 from PyQt5 import QtWidgets, QtCore
 from herre_next.grants.oauth2.authorization_code import AuthorizationCodeGrant
 from herre_next.grants.oauth2.redirecters.qt_login_view import WebViewRedirecter
-from tests.utils import wait_for_qttask, loggin_wrapper_result
-
+from tests.utils import loggin_wrapper_result
+from koil.contrib.pytest_qt import wait_for_qttask
 
 class QtHerreWidget(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.koil = create_qt_koil(parent=self)
 
         self.grant = AuthorizationCodeGrant(
             base_url="http://localhost:8000/o",
@@ -25,7 +25,7 @@ class QtHerreWidget(QtWidgets.QWidget):
 
         self.herre.enter()
 
-        self.login_task = QtRunner(self.herre.aget_token)
+        self.login_task = async_to_qt(self.herre.aget_token)
 
         self.button_greet = QtWidgets.QPushButton("Greet")
         self.greet_label = QtWidgets.QLabel("")

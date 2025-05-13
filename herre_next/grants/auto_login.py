@@ -135,7 +135,8 @@ class AutoLoginGrant(BaseGrant):
                         user = await self.fetcher.afetch_user(token)
                         await self.store.aput_default_user(
                             StoredUser(
-                                user=user.dict(), token=token  # type: ignore# we dict here to ensure the serialization works
+                                user=user.model_dump(),
+                                token=token,  # type: ignore# we dict here to ensure the serialization works
                             )
                         )
                         return token
