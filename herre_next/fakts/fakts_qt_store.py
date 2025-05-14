@@ -4,7 +4,7 @@ from herre_next.grants.auto_login import (
 from typing import Dict, Optional
 
 import json
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from fakts_next import Fakts
 import logging
 from qtpy import QtCore
@@ -26,6 +26,9 @@ class OrderDefaults(BaseModel):
 class FaktsQtStore(BaseModel):
     """Retrieves and stores users matching the currently
     active fakts grant"""
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
 
     settings: QtCore.QSettings  # type: ignore
     default_user_key: str = "default_user_fakts"
@@ -91,8 +94,3 @@ class FaktsQtStore(BaseModel):
             return None
 
         return None
-
-    class Config:
-        """pydantic config"""
-
-        arbitrary_types_allowed = True
