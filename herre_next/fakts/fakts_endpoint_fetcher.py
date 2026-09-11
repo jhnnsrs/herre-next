@@ -5,7 +5,7 @@ import aiohttp
 from herre_next.fetcher.models import Token
 import logging
 from herre_next.fetcher.errors import UserFetchingError
-from fakts_next import Fakts
+from fakts import Fakts
 from typing import Type
 
 logger = logging.getLogger(__name__)

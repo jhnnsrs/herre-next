@@ -3,7 +3,7 @@ from pydantic import BaseModel, SecretStr
 from herre_next.fakts.registry import GrantType, GrantRegistry
 from herre_next.grants.oauth2.base import BaseOauth2Grant
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
-from fakts_next import Fakts
+from fakts import Fakts
 from herre_next.models import Token, TokenRequest
 import logging
 

@@ -1,7 +1,7 @@
 from typing import Dict, Callable
 
 from pydantic import BaseModel, ConfigDict, Field
-from fakts_next.grants.base import BaseFaktsGrant
+from fakts.grants.base import BaseFaktsGrant
 import logging
 from enum import Enum
 

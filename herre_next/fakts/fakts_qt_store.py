@@ -5,7 +5,7 @@ from typing import Dict, Optional
 
 import json
 from pydantic import BaseModel, ConfigDict
-from fakts_next import Fakts
+from fakts import Fakts
 import logging
 from qtpy import QtCore
 
