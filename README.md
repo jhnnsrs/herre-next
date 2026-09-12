@@ -1,5 +1,10 @@
 # herre
 
+> # ⚠️ DEPRECATED — do not use for new work
+>
+> This package is **no longer maintained** and should not be used by anything new.
+> Its last release was 1.3.0 (2025-05-14).
+
 [![codecov](https://codecov.io/gh/jhnnsrs/herre/branch/master/graph/badge.svg?token=UGXEA2THBV)](https://codecov.io/gh/jhnnsrs/herre)
 [![PyPI version](https://badge.fury.io/py/herre.svg)](https://pypi.org/project/herre/)
 ![Maintainer](https://img.shields.io/badge/maintainer-jhnnsrs-blue)
