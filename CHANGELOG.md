@@ -1,6 +1,32 @@
 # CHANGELOG
 
 
+## v1.3.1 (2026-09-30)
+
+### Bug Fixes
+
+- Move onto the renamed arkitekt packages
+  ([`c9c5047`](https://github.com/jhnnsrs/herre-next/commit/c9c5047836c4b68d1e4905b214bbbda89952b79b))
+
+The *-next distributions were folded back onto their original PyPI names, so fakts_next,
+  rekuest_next, mikro_next and fluss_next no longer exist. Imports and dependency floors now point
+  at what actually shipped: fakts>=2, rekuest>=3, mikro>=3, fluss>=2.
+
+These integrations sit behind try/except on the importing side, so the stale module paths never
+  raised -- the features just silently went missing.
+
+### Documentation
+
+- Mark this package deprecated
+  ([`3e3fef3`](https://github.com/jhnnsrs/herre-next/commit/3e3fef315ae3ad3ae7cfd1556cd7ed8925b5f49c))
+
+It is no longer maintained. Its last release was 1.3.0 (2025-05-14).
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+Claude-Session: https://claude.ai/code/session_018y7X4q6UvWWUyY1xYaEoK7
+
+
 ## v1.3.0 (2025-05-14)
 
 ### Bug Fixes
